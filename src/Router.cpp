@@ -104,10 +104,19 @@ void Router::txProcess()
     } 
   else 
     { 
+      bool rr_forwarded = false;
+      static const int rr_order[5] = {
+          DIRECTION_LOCAL,
+          DIRECTION_NORTH,
+          DIRECTION_SOUTH,
+          DIRECTION_EAST,
+          DIRECTION_WEST
+      };
+
       // 1st phase: Reservation
-      for (int j = 0; j < DIRECTIONS + 2; j++) 
+      for (int j = 0; j < 5; j++)
 	{
-	  int i = (start_from_port + j) % (DIRECTIONS + 2);
+	  int i = rr_order[(start_from_port + j) % 5];
 
 	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
 	  {
@@ -177,7 +186,7 @@ void Router::txProcess()
 	    start_from_vc[i] = (start_from_vc[i]+1)%GlobalParams::n_virtual_channels;
 	}
 
-      start_from_port = (start_from_port + 1) % (DIRECTIONS + 2);
+      // rr_ptr agora avanca somente quando um flit e efetivamente encaminhado
 
       // 2nd phase: Forwarding
       //if (local_id==6) LOG<<"*TX*****local_id="<<local_id<<"__ack_tx[0]= "<<ack_tx[0].read()<<endl;
@@ -211,6 +220,7 @@ void Router::txProcess()
 		      current_level_tx[o] = 1 - current_level_tx[o];
 		      req_tx[o].write(current_level_tx[o]);
 		      buffer[i][vc].Pop();
+		      rr_forwarded = true;
 
 		      if (flit.flit_type == FLIT_TYPE_TAIL ||
                     (flit.flit_type == FLIT_TYPE_HEAD &&
@@ -267,6 +277,9 @@ void Router::txProcess()
 	  } // if not reserved 
 	 // else LOG<<"we have no reservation for direction "<<i<< endl;
       } // for loop directions
+
+      if (rr_forwarded)
+          start_from_port = (start_from_port + 1) % 5;
 
       if ((int)(sc_time_stamp().to_double() / GlobalParams::clock_period_ps)%2==0)
 	  reservation_table.updateIndex();
@@ -544,7 +557,7 @@ void Router::configure(const int _id,
     local_id = _id;
     stats.configure(_id, _warm_up_time);
 
-    start_from_port = DIRECTION_LOCAL;
+    start_from_port = 0;  // rr_ptr: 0=LOCAL,1=NORTH,2=SOUTH,3=EAST,4=WEST
   
 
     if (grt.isValid())
