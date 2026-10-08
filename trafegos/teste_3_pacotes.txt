@@ -1,0 +1,17 @@
+% ciclo 0: PE 0 -> PE 1
+0 1
+-1
+
+% ciclo 1: sem trafego
+-1
+
+% ciclo 2: PE 0 -> PE 8
+0 8
+-1
+
+% ciclo 3: sem trafego
+-1
+
+% ciclo 4: PE 63 -> PE 0
+63 0
+-1
