@@ -471,9 +471,9 @@ void checkConfiguration()
 	exit(1);
     }
 
-    if (GlobalParams::min_packet_size < 2 ||
-	GlobalParams::max_packet_size < 2) {
-	cerr << "Error: packet size must be >= 2" << endl;
+    if (GlobalParams::min_packet_size < 1 ||
+	GlobalParams::max_packet_size < 1) {
+	cerr << "Error: packet size must be >= 1" << endl;
 	exit(1);
     }
 

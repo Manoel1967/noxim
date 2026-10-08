@@ -212,7 +212,9 @@ void Router::txProcess()
 		      req_tx[o].write(current_level_tx[o]);
 		      buffer[i][vc].Pop();
 
-		      if (flit.flit_type == FLIT_TYPE_TAIL)
+		      if (flit.flit_type == FLIT_TYPE_TAIL ||
+                    (flit.flit_type == FLIT_TYPE_HEAD &&
+                     flit.sequence_length == 1))
 		      {
 			  TReservation r;
 			  r.input = i;
